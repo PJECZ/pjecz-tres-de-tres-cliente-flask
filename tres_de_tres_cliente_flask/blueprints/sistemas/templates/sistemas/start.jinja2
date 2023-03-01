@@ -1,0 +1,27 @@
+{% extends "layouts/app.jinja2" %}
+
+{% block title %}Portal de Solicitud de Constancia Tres de Tres{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-md-center">
+        <div class="col-md-8">
+
+            <div class="card mt-5 p-5">
+                <img src="{{url_for('static', filename='img/3de3-pjecz.png')}}" class="card-img-top"  >
+                <div class="card-body">
+                        <hr>
+                        <h1 class="display-5 fw-bold mb-4">Bienvenido</h1>
+                        <p class="lead mb-4">En este módulo usted podra registrar su Solicitud de Constancia para las personas candidatas del Proceso Electoral 2023.</p>
+                        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                            <a href="/solicitud" class="btn btn-outline-secondary btn-lg px-4">Inicia Registro</a>
+                        </div>
+                        
+                </div>
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_javascript %}
+{% endblock %}

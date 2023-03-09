@@ -1,19 +1,18 @@
 """
 Solicitudes, formularios
 """
+from flask import abort
 from flask_wtf import FlaskForm
 from flask_wtf.recaptcha import RecaptchaField
-from wtforms import BooleanField, EmailField, HiddenField, SelectField, StringField, SubmitField, FileField
+from wtforms import BooleanField, EmailField, SelectField, StringField, SubmitField, FileField
 from wtforms.validators import DataRequired, Length
-from config.settings import API_BASE_URL, API_TIMEOUT
-
 import requests
 
-class IngresarForm(FlaskForm):
-    """Formulario para ingresar datos personales"""
+from config.settings import API_BASE_URL, API_TIMEOUT
 
 
-# Consultar lista de Partidos Politicos
+def partidos_politicos():
+    """Consultar los partidos políticos"""
     try:
         respuesta = requests.get(
             f"{API_BASE_URL}/tdt_partidos",
@@ -29,9 +28,12 @@ class IngresarForm(FlaskForm):
     except requests.exceptions.RequestException as error:
         abort(500, "Error desconocido con la API 3de3. " + str(error))
     datos = respuesta.json()
-    
-    items  = datos['result']['items']
+    items = datos["result"]["items"]
+    return [("", "Selecciona un partido")] + [(key["siglas"], key["nombre"]) for key in items]
 
+
+def municipios():
+    """Consultar los municipios"""
     try:
         respuesta = requests.get(
             f"{API_BASE_URL}/municipios",
@@ -47,9 +49,13 @@ class IngresarForm(FlaskForm):
     except requests.exceptions.RequestException as error:
         abort(500, "Error desconocido con la API Municipios. " + str(error))
     datos = respuesta.json()
-    
-    items_municipios  = datos['result']['items']
-    
+    items = datos["result"]["items"]
+    return [("", "Selecciona un municipio")] + [(key["id_hasheado"], key["nombre"]) for key in items]
+
+
+class IngresarForm(FlaskForm):
+    """Formulario para ingresar datos personales"""
+
     nombres = StringField(
         "Nombres",
         default="Carlos Gabriel",
@@ -105,30 +111,24 @@ class IngresarForm(FlaskForm):
     municipio = SelectField(
         "Municipio",
         validators=[DataRequired()],
-        choices = [ ("","Selecciona un municipio") ] + [ (key['id_hasheado'] , key['nombre'] ) for key in items_municipios  ],
+        choices=municipios(),
     )
     partido = SelectField(
         "Partido Político",
         validators=[DataRequired()],
-        choices = [ ("","Selecciona un partido") ] + [ (key['siglas'] , key['nombre'] ) for key in items  ],
+        choices=partidos_politicos(),
         default="MORENA",
     )
     cargo = SelectField(
         "Cargo",
         validators=[DataRequired()],
-        choices = [ ("","Selecciona un cargo"),
-                    ("GOBERNATURA", "Gobernatura"),
-                    ("PRESIDENCIA MUNICIPAL", "Presidencia Municipal"),
-                    ("REGIDURIA", "Regiduría"),
-                    ("SINDICATURA", "Sindicatura") ] ,
+        choices=[("", "Selecciona un cargo"), ("GOBERNATURA", "Gobernatura"), ("PRESIDENCIA MUNICIPAL", "Presidencia Municipal"), ("REGIDURIA", "Regiduría"), ("SINDICATURA", "Sindicatura")],
         default="SINDICATURA",
     )
     principio = SelectField(
         "Principio",
         validators=[DataRequired()],
-        choices = [ ("","Selecciona un principio"),
-                    ("MAYORIA RELATIVA", "Mayoría relativa"),
-                    ("REPRESENTACION PROPORCIONAL", "Representación proporcional") ] ,
+        choices=[("", "Selecciona un principio"), ("MAYORIA RELATIVA", "Mayoría relativa"), ("REPRESENTACION PROPORCIONAL", "Representación proporcional")],
         default="MAYORIA RELATIVA",
     )
     ine = FileField(

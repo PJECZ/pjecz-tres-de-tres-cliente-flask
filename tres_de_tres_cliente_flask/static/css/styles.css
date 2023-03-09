@@ -4,7 +4,7 @@ body {
   margin: 0px;
   height: 100%;
   min-height: 100%;
-  background-color: #037F8C;
+  background-color: #037f8c;
 }
 
 .sombra {
@@ -16,7 +16,6 @@ body {
   color: #666;
   bottom: 0;
   position: fixed;
-
 }
 
 .link-footer {
@@ -40,38 +39,37 @@ body {
 }
 
 .btn-verde {
-  background-color: #037F8C;
+  background-color: #037f8c;
   color: #fff;
 }
 
-input[type=file]::file-selector-button {
+input[type="file"]::file-selector-button {
   border: 1px solid #023d43;
-  padding: .2em .4em;
-  border-radius: .2em;
-  background-color: #037F8C;
+  padding: 0.2em 0.4em;
+  border-radius: 0.2em;
+  background-color: #037f8c;
   transition: 1s;
   color: #000;
 }
 
-input[type=file]::file-selector-button:hover {
+input[type="file"]::file-selector-button:hover {
   background-color: #81ecec;
   border: 2px solid #00cec9;
   color: #555;
 }
 
-label{
-  font-size: .75em;
+label {
+  font-size: 0.75em;
   font-weight: bold;
   margin-bottom: 0px !important;
 }
 
-.url-descarga{ 
+.url-descarga {
   color: #555;
   text-decoration: none;
 }
 
-.url-descarga:hover{
+.url-descarga:hover {
   font-weight: bold;
   color: #555;
 }
-

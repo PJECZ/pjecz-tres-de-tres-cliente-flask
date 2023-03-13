@@ -1,4 +1,5 @@
 # pjecz-tres-de-tres-cliente-flask
+
 Front-end del registro de solicitudes para el Tres de Tres hecho en Flask.
 
 ## Configurar
@@ -107,4 +108,30 @@ Ejecutar Flask con el alias arrancar
     . .bashrc
     arrancar
 
+## Google Cloud deployment
 
+Crear el archivo `app.yaml` con las variables para producción
+
+    runtime: python310
+    instance_class: F1
+    service: tres-de-tres
+    env_variables:
+      API_BASE_URL: "https://citas-api-oauth2.justiciadigital.gob.mx/v3"
+      API_TIMEOUT: 24
+      BASE_URL: "https://tres-de-tres.justiciadigital.gob.mx"
+      FLASK_APP: tres_de_tres_cliente_flask/app.py
+      FLASK_DEBUG: 0
+      SALT: XXXXXXXXXXXXXXXXXXXXXXXX
+      SECRET_KEY: XXXXXXXXXXXXXXXXXXXXXXXX
+      RECAPTCHA_PUBLIC_KEY: "XXXXXXXXXXXXXXXXXXXXXXXX"
+      RECAPTCHA_PRIVATE_KEY: "XXXXXXXXXXXXXXXXXXXXXXXX"
+    vpc_access_connector:
+      name: projects/justicia-digital-gob-mx/locations/us-west2/connectors/cupido
+
+Crear el archivo `requirements.txt`
+
+    poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+Y subir a Google Cloud con
+
+    gcloud app deploy

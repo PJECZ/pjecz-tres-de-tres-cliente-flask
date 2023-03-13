@@ -16,6 +16,7 @@ def cargos():
     return [
         ("", "Selecciona un cargo"),
         ("GOBERNATURA", "Gobernatura"),
+        ("DIPUTACION", "Diputación"),
         ("PRESIDENCIA MUNICIPAL", "Presidencia Municipal"),
         ("REGIDURIA", "Regiduría"),
         ("SINDICATURA", "Sindicatura"),
@@ -78,54 +79,54 @@ class IngresarForm(FlaskForm):
 
     nombres = StringField(
         "Nombres",
-        default="Carlos Gabriel",
+        default="",
         validators=[DataRequired(), Length(min=3, max=64)],
     )
     apellido_primero = StringField(
         "Primer apellido",
-        default="Hernandez",
+        default="",
         validators=[DataRequired(), Length(min=3, max=64)],
     )
     apellido_segundo = StringField(
         "Segundo apellido",
-        default="Salas",
+        default="",
         validators=[DataRequired(), Length(min=3, max=64)],
     )
     curp = StringField(
         "CURP",
-        default="HESC741104HCLRLR09",
+        default="",
         validators=[DataRequired(), Length(min=18, max=18)],
         render_kw={"placeholder": "18 caracteres"},
     )
     email = EmailField(
         "Email",
-        default="carlos.hernandez@coahuila.gob.mx",
+        default="",
         validators=[DataRequired(), Length(min=3, max=128)],
     )
     telefono = StringField(
         "Telefono celular",
-        default="8442180123",
+        default="",
         validators=[DataRequired(), Length(min=10, max=10)],
         render_kw={"placeholder": "10 dígitos sin espacios ni guiones"},
     )
     colonia = StringField(
         "Colonia",
-        default="Lomas de Lourdes",
+        default="",
         validators=[DataRequired(), Length(min=10, max=50)],
     )
     calle = StringField(
         "Calle",
-        default="Correcaminos",
+        default="",
         validators=[DataRequired(), Length(min=10, max=50)],
     )
     numero = StringField(
         "Numero",
-        default="1290",
+        default="",
         validators=[DataRequired(), Length(min=2, max=15)],
     )
     codigoPostal = StringField(
         "Codigo Postal",
-        default="25090",
+        default="",
         validators=[DataRequired(), Length(min=5, max=5)],
     )
     municipio = SelectField(
@@ -137,19 +138,19 @@ class IngresarForm(FlaskForm):
         "Partido Político",
         validators=[DataRequired()],
         choices=partidos_politicos(),
-        default="MORENA",
+        default="",
     )
     cargo = SelectField(
         "Cargo",
         validators=[DataRequired()],
         choices=cargos(),
-        default="SINDICATURA",
+        default="",
     )
     principio = SelectField(
         "Principio",
         validators=[DataRequired()],
         choices=principios(),
-        default="MAYORIA RELATIVA",
+        default="",
     )
     ine = FileField(
         "Credencial de elector",

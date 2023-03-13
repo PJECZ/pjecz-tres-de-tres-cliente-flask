@@ -9,7 +9,6 @@
         <div class="card mb-5">
             <img src="{{url_for('static', filename='img/3de3-violencia-de-genero.jpeg')}}" class="card-img-top">
             <div class="card-body">
-                
                 <h5>Registre sus datos para la constancia</h5>
                 {% call f.form_tag('solicitudes.ingresar', fid='solicitudes_ingresar') %}
                 <div class="row">
@@ -64,7 +63,6 @@
                         {% call f.form_group(form.principio) %}{% endcall %}
                     </div>
                 </div>
-                {% if(1==1) %}
                 <div class="row">
                     <div class="col-md-12">
                         {% call f.form_group(form.ine) %}{% endcall %}
@@ -85,19 +83,13 @@
                     </div>
                 </div>
                 <br>
-                
-                
-                    {% call f.form_group(form.recaptcha) %}{% endcall %}
-                {% endif %}
-
+                {% call f.form_group(form.recaptcha) %}{% endcall %}
                 {% call f.form_group(form.aceptar) %}{% endcall %}
-
                 <div class="row">
                     <div class="col-md-12 text-center">
                         {% call f.form_group(form.registrar) %}{% endcall %}
                     </div>
                 </div>
-
                 {% endcall %}
             </div>
         </div>
@@ -108,6 +100,5 @@
 {% block custom_javascript %}
 <!-- reCaptcha Integration -->
 <script src='https://www.google.com/recaptcha/api.js' async defer></script>
-
 {% endblock %}
 

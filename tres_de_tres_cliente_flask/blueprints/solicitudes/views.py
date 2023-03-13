@@ -16,11 +16,11 @@ solicitudes = Blueprint("solicitudes", __name__, template_folder="templates")
 @solicitudes.route("/solicitud", methods=["GET", "POST"])
 def ingresar():
     """Ingresar datos personales"""
-
     form = IngresarForm()
 
+    # Si viene el formulario
     if form.validate_on_submit():
-        # Preparar el cuerpo a enviar a la API
+        # Solicitar a la API un nuevo registro
         request_body = {
             "cit_cliente_nombres": safe_string(form.nombres.data, save_enie=True),
             "cit_cliente_apellido_primero": safe_string(form.apellido_primero.data, save_enie=True),
@@ -63,7 +63,7 @@ def ingresar():
         if datos["success"] is False:
             return redirect(url_for("resultados.fallido", message=datos["message"]))
 
-        # Documento INE
+        # Enviar a la API el documento INE
         archivo_ine = request.files["ine"]
         try:
             respuesta = requests.post(
@@ -88,7 +88,7 @@ def ingresar():
         if datos["success"] is False:
             return redirect(url_for("resultados.fallido", message=datos_ine["message"]))
 
-        # documento Comprobante de domicilio
+        # Enviar a la API el comprobante de domicilio
         archivo_comprobante = request.files["comprobante"]
         try:
             respuesta = requests.post(
@@ -113,9 +113,8 @@ def ingresar():
         if datos["success"] is False:
             return redirect(url_for("resultados.fallido", message=datos_comprobante["message"]))
 
-        # documento Autorizacion
+        # Enviar a la API el documento de autorizacion
         archivo_autorizacion = request.files["autorizacion"]
-
         try:
             respuesta = requests.post(
                 f"{API_BASE_URL}/tdt_solicitudes/subir/autorizacion?id_hasheado={datos['id_hasheado']}",
@@ -142,6 +141,7 @@ def ingresar():
         # Redireccionar a la página de resultados
         return redirect(url_for("resultados.registrado", folio="F-" + str(descifrar_id(datos["id_hasheado"])).zfill(5)))
 
+    # Mostrar el formulario
     return render_template(
         "solicitudes/solicitud.jinja2",
         form=form,

@@ -4,15 +4,26 @@ Solicitudes, formularios
 from flask import abort
 from flask_wtf import FlaskForm
 from flask_wtf.recaptcha import RecaptchaField
+import requests
 from wtforms import BooleanField, EmailField, SelectField, StringField, SubmitField, FileField
 from wtforms.validators import DataRequired, Length
-import requests
 
 from config.settings import API_BASE_URL, API_TIMEOUT
 
 
+def cargos():
+    """Listado para el select de cargos"""
+    return [
+        ("", "Selecciona un cargo"),
+        ("GOBERNATURA", "Gobernatura"),
+        ("PRESIDENCIA MUNICIPAL", "Presidencia Municipal"),
+        ("REGIDURIA", "Regiduría"),
+        ("SINDICATURA", "Sindicatura"),
+    ]
+
+
 def partidos_politicos():
-    """Consultar los partidos políticos"""
+    """Listado para el select de partidos políticos"""
     try:
         respuesta = requests.get(
             f"{API_BASE_URL}/tdt_partidos",
@@ -32,8 +43,17 @@ def partidos_politicos():
     return [("", "Selecciona un partido")] + [(key["siglas"], key["nombre"]) for key in items]
 
 
+def principios():
+    """Listado para el select de principios"""
+    return [
+        ("", "Selecciona un principio"),
+        ("MAYORIA RELATIVA", "Mayoría relativa"),
+        ("REPRESENTACION PROPORCIONAL", "Representación proporcional"),
+    ]
+
+
 def municipios():
-    """Consultar los municipios"""
+    """Listado para el select de municipios"""
     try:
         respuesta = requests.get(
             f"{API_BASE_URL}/municipios",
@@ -122,13 +142,13 @@ class IngresarForm(FlaskForm):
     cargo = SelectField(
         "Cargo",
         validators=[DataRequired()],
-        choices=[("", "Selecciona un cargo"), ("GOBERNATURA", "Gobernatura"), ("PRESIDENCIA MUNICIPAL", "Presidencia Municipal"), ("REGIDURIA", "Regiduría"), ("SINDICATURA", "Sindicatura")],
+        choices=cargos(),
         default="SINDICATURA",
     )
     principio = SelectField(
         "Principio",
         validators=[DataRequired()],
-        choices=[("", "Selecciona un principio"), ("MAYORIA RELATIVA", "Mayoría relativa"), ("REPRESENTACION PROPORCIONAL", "Representación proporcional")],
+        choices=principios(),
         default="MAYORIA RELATIVA",
     )
     ine = FileField(
@@ -146,7 +166,7 @@ class IngresarForm(FlaskForm):
         validators=[DataRequired()],
         render_kw={"placeholder": "Autorización firmada en archivo PDF", "accept": "application/pdf"},
     )
-    recaptcha = RecaptchaField()
+    # recaptcha = RecaptchaField()
     aceptar = BooleanField(
         "He leído y acepto el <a href='/aviso' class='nav-link link-aviso'>Aviso de Privacidad</a>",
         validators=[DataRequired()],

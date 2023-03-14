@@ -49,7 +49,7 @@
                         {% call f.form_group(form.numero) %}{% endcall %}
                     </div>
                     <div class="col-md-2">
-                        {% call f.form_group(form.codigoPostal) %}{% endcall %}
+                        {% call f.form_group(form.cp) %}{% endcall %}
                     </div>
                 </div>
                 <div class="row">
@@ -83,7 +83,7 @@
                     </div>
                 </div>
                 <br>
-                {% call f.form_group(form.recaptcha) %}{% endcall %}
+                {# call f.form_group(form.recaptcha) %}{% endcall #}
                 {% call f.form_group(form.aceptar) %}{% endcall %}
                 <div class="row">
                     <div class="col-md-12 text-center">

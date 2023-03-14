@@ -16,14 +16,33 @@ def cargos():
     return [
         ("", "Selecciona un cargo"),
         ("GOBERNATURA", "Gobernatura"),
-        ("PRESIDENCIA MUNICIPAL", "Presidencia Municipal"),
-        ("REGIDURIA", "Regiduría"),
-        ("SINDICATURA", "Sindicatura"),
+        ("DIPUTACION", "Diputación"),
     ]
 
 
-def partidos_politicos():
-    """Listado para el select de partidos políticos"""
+def municipios():
+    """Listado para el select de municipios"""
+    try:
+        respuesta = requests.get(
+            f"{API_BASE_URL}/municipios",
+            timeout=API_TIMEOUT,
+        )
+        respuesta.raise_for_status()
+    except requests.exceptions.ConnectionError as error:
+        abort(500, "No se pudo conectar con la API Municipios. " + str(error))
+    except requests.exceptions.Timeout as error:
+        abort(500, "Tiempo de espera agotado al conectar con la API Municipios. " + str(error))
+    except requests.exceptions.HTTPError as error:
+        abort(500, "Error HTTP porque la API Municipios arrojó un problema: " + str(error))
+    except requests.exceptions.RequestException as error:
+        abort(500, "Error desconocido con la API Municipios. " + str(error))
+    datos = respuesta.json()
+    items = datos["result"]["items"]
+    return [("", "Selecciona un municipio")] + [(key["id_hasheado"], key["nombre"]) for key in items]
+
+
+def partidos():
+    """Listado para el select de partidos"""
     try:
         respuesta = requests.get(
             f"{API_BASE_URL}/tdt_partidos",
@@ -52,107 +71,83 @@ def principios():
     ]
 
 
-def municipios():
-    """Listado para el select de municipios"""
-    try:
-        respuesta = requests.get(
-            f"{API_BASE_URL}/municipios",
-            timeout=API_TIMEOUT,
-        )
-        respuesta.raise_for_status()
-    except requests.exceptions.ConnectionError as error:
-        abort(500, "No se pudo conectar con la API Municipios. " + str(error))
-    except requests.exceptions.Timeout as error:
-        abort(500, "Tiempo de espera agotado al conectar con la API Municipios. " + str(error))
-    except requests.exceptions.HTTPError as error:
-        abort(500, "Error HTTP porque la API Municipios arrojó un problema: " + str(error))
-    except requests.exceptions.RequestException as error:
-        abort(500, "Error desconocido con la API Municipios. " + str(error))
-    datos = respuesta.json()
-    items = datos["result"]["items"]
-    return [("", "Selecciona un municipio")] + [(key["id_hasheado"], key["nombre"]) for key in items]
-
-
 class IngresarForm(FlaskForm):
     """Formulario para ingresar datos personales"""
 
     nombres = StringField(
         "Nombres",
-        default="Carlos Gabriel",
+        default="",
         validators=[DataRequired(), Length(min=3, max=64)],
     )
     apellido_primero = StringField(
         "Primer apellido",
-        default="Hernandez",
+        default="",
         validators=[DataRequired(), Length(min=3, max=64)],
     )
     apellido_segundo = StringField(
         "Segundo apellido",
-        default="Salas",
+        default="",
         validators=[DataRequired(), Length(min=3, max=64)],
     )
     curp = StringField(
         "CURP",
-        default="HESC741104HCLRLR09",
+        default="",
         validators=[DataRequired(), Length(min=18, max=18)],
         render_kw={"placeholder": "18 caracteres"},
     )
     email = EmailField(
         "Email",
-        default="carlos.hernandez@coahuila.gob.mx",
+        default="",
         validators=[DataRequired(), Length(min=3, max=128)],
     )
     telefono = StringField(
-        "Telefono celular",
-        default="8442180123",
+        "Teléfono celular",
+        default="",
         validators=[DataRequired(), Length(min=10, max=10)],
         render_kw={"placeholder": "10 dígitos sin espacios ni guiones"},
     )
     colonia = StringField(
         "Colonia",
-        default="Lomas de Lourdes",
+        default="",
         validators=[DataRequired(), Length(min=10, max=50)],
     )
     calle = StringField(
         "Calle",
-        default="Correcaminos",
+        default="",
         validators=[DataRequired(), Length(min=10, max=50)],
     )
     numero = StringField(
-        "Numero",
-        default="1290",
+        "Número",
+        default="",
         validators=[DataRequired(), Length(min=2, max=15)],
     )
-    codigoPostal = StringField(
-        "Codigo Postal",
-        default="25090",
+    cp = StringField(
+        "Código Postal",
+        default="",
         validators=[DataRequired(), Length(min=5, max=5)],
     )
     municipio = SelectField(
         "Municipio",
-        validators=[DataRequired()],
-        choices=municipios(),
+        coerce=str,
     )
     partido = SelectField(
         "Partido Político",
-        validators=[DataRequired()],
-        choices=partidos_politicos(),
-        default="MORENA",
+        coerce=str,
     )
     cargo = SelectField(
         "Cargo",
         validators=[DataRequired()],
         choices=cargos(),
-        default="SINDICATURA",
+        default="",
     )
     principio = SelectField(
         "Principio",
         validators=[DataRequired()],
         choices=principios(),
-        default="MAYORIA RELATIVA",
+        default="",
     )
     ine = FileField(
-        "Credencial de elector",
+        "Identificación oficial",
         validators=[DataRequired()],
         render_kw={"placeholder": "Seleccione un archivo PDF con la INE por ambos lados", "accept": "application/pdf"},
     )

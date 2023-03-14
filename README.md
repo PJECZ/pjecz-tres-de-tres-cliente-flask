@@ -6,8 +6,8 @@ Front-end del registro de solicitudes para el Tres de Tres hecho en Flask.
 
 Crear archivo `.env` con
 
-    # Citas cliente API:
-    API_BASE_URL=http://localhost:7086/v3
+    # Citas cliente API
+    API_BASE_URL=http://127.0.0.1:8005/v3
     API_TIMEOUT=12
 
     # Base URL

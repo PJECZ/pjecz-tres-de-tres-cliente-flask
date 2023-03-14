@@ -17,14 +17,32 @@ def cargos():
         ("", "Selecciona un cargo"),
         ("GOBERNATURA", "Gobernatura"),
         ("DIPUTACION", "Diputación"),
-        ("PRESIDENCIA MUNICIPAL", "Presidencia Municipal"),
-        ("REGIDURIA", "Regiduría"),
-        ("SINDICATURA", "Sindicatura"),
     ]
 
 
-def partidos_politicos():
-    """Listado para el select de partidos políticos"""
+def municipios():
+    """Listado para el select de municipios"""
+    try:
+        respuesta = requests.get(
+            f"{API_BASE_URL}/municipios",
+            timeout=API_TIMEOUT,
+        )
+        respuesta.raise_for_status()
+    except requests.exceptions.ConnectionError as error:
+        abort(500, "No se pudo conectar con la API Municipios. " + str(error))
+    except requests.exceptions.Timeout as error:
+        abort(500, "Tiempo de espera agotado al conectar con la API Municipios. " + str(error))
+    except requests.exceptions.HTTPError as error:
+        abort(500, "Error HTTP porque la API Municipios arrojó un problema: " + str(error))
+    except requests.exceptions.RequestException as error:
+        abort(500, "Error desconocido con la API Municipios. " + str(error))
+    datos = respuesta.json()
+    items = datos["result"]["items"]
+    return [("", "Selecciona un municipio")] + [(key["id_hasheado"], key["nombre"]) for key in items]
+
+
+def partidos():
+    """Listado para el select de partidos"""
     try:
         respuesta = requests.get(
             f"{API_BASE_URL}/tdt_partidos",
@@ -51,27 +69,6 @@ def principios():
         ("MAYORIA RELATIVA", "Mayoría relativa"),
         ("REPRESENTACION PROPORCIONAL", "Representación proporcional"),
     ]
-
-
-def municipios():
-    """Listado para el select de municipios"""
-    try:
-        respuesta = requests.get(
-            f"{API_BASE_URL}/municipios",
-            timeout=API_TIMEOUT,
-        )
-        respuesta.raise_for_status()
-    except requests.exceptions.ConnectionError as error:
-        abort(500, "No se pudo conectar con la API Municipios. " + str(error))
-    except requests.exceptions.Timeout as error:
-        abort(500, "Tiempo de espera agotado al conectar con la API Municipios. " + str(error))
-    except requests.exceptions.HTTPError as error:
-        abort(500, "Error HTTP porque la API Municipios arrojó un problema: " + str(error))
-    except requests.exceptions.RequestException as error:
-        abort(500, "Error desconocido con la API Municipios. " + str(error))
-    datos = respuesta.json()
-    items = datos["result"]["items"]
-    return [("", "Selecciona un municipio")] + [(key["id_hasheado"], key["nombre"]) for key in items]
 
 
 class IngresarForm(FlaskForm):
@@ -124,21 +121,18 @@ class IngresarForm(FlaskForm):
         default="",
         validators=[DataRequired(), Length(min=2, max=15)],
     )
-    codigoPostal = StringField(
+    cp = StringField(
         "Codigo Postal",
         default="",
         validators=[DataRequired(), Length(min=5, max=5)],
     )
     municipio = SelectField(
         "Municipio",
-        validators=[DataRequired()],
-        choices=municipios(),
+        coerce=str,
     )
     partido = SelectField(
         "Partido Político",
-        validators=[DataRequired()],
-        choices=partidos_politicos(),
-        default="",
+        coerce=str,
     )
     cargo = SelectField(
         "Cargo",

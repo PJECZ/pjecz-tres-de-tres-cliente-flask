@@ -2,21 +2,28 @@
 Solicitudes, vistas
 """
 from flask import abort, Blueprint, render_template, redirect, request, url_for
+from wtforms.validators import DataRequired
 import requests
 
 from config.settings import API_BASE_URL, API_TIMEOUT
 from lib.safe_string import safe_email, safe_string
 from lib.hashids import descifrar_id
 
-from tres_de_tres_cliente_flask.blueprints.solicitudes.forms import IngresarForm
+from tres_de_tres_cliente_flask.blueprints.solicitudes.forms import IngresarForm, municipios, partidos
 
 solicitudes = Blueprint("solicitudes", __name__, template_folder="templates")
 
 
 @solicitudes.route("/solicitud", methods=["GET", "POST"])
 def ingresar():
-    """Ingresar datos personales"""
+    """Ingresar solicitud"""
     form = IngresarForm()
+
+    # Alimentar las opciones para los select de municipios y partidos
+    form.municipio.choices = municipios()
+    form.municipio.validators = [DataRequired()]
+    form.partido.choices = partidos()
+    form.partido.validators = [DataRequired()]
 
     # Si viene el formulario
     if form.validate_on_submit():
@@ -29,13 +36,13 @@ def ingresar():
             "cit_cliente_email": safe_email(form.email.data),
             "cit_cliente_telefono": safe_string(form.telefono.data),
             "tdt_partido_siglas": safe_string(form.partido.data),
-            "municipio_id_hasheado": safe_string(form.municipio.data),
+            "municipio_id_hasheado": safe_string(form.municipio.data, to_uppercase=False),
             "cargo": safe_string(form.cargo.data),
             "principio": safe_string(form.principio.data),
             "domicilio_calle": safe_string(form.calle.data),
             "domicilio_numero": safe_string(form.numero.data),
             "domicilio_colonia": safe_string(form.colonia.data),
-            "domicilio_cp": safe_string(form.codigo.data),
+            "domicilio_cp": safe_string(form.cp.data),
             "identificacion_oficial_url": "",
             "comprobante_domicilio_url": "",
             "autorizacion_url": "",
@@ -48,13 +55,13 @@ def ingresar():
             )
             respuesta.raise_for_status()
         except requests.exceptions.ConnectionError as error:
-            abort(500, "No se pudo conectar con la API 3de3. " + str(error))
+            abort(500, "No se pudo conectar con la API: " + str(error))
         except requests.exceptions.Timeout as error:
-            abort(500, "Tiempo de espera agotado al conectar con la API 3de3. " + str(error))
+            abort(500, "Tiempo de espera agotado al conectar con la API: " + str(error))
         except requests.exceptions.HTTPError as error:
-            abort(500, "Error HTTP porque la API de 3de3 arrojó un problema: " + str(error))
+            abort(500, "Error HTTP porque la API arrojó un problema: " + str(error))
         except requests.exceptions.RequestException as error:
-            abort(500, "Error desconocido con la API 3de3. " + str(error))
+            abort(500, "Error desconocido con la API: " + str(error))
         datos = respuesta.json()
 
         # Verificar que haya tenido exito
@@ -63,7 +70,7 @@ def ingresar():
         if datos["success"] is False:
             return redirect(url_for("resultados.fallido", message=datos["message"]))
 
-        # Enviar a la API el documento INE
+        # Enviar a la API la identificacion oficial
         archivo_ine = request.files["ine"]
         try:
             respuesta = requests.post(
@@ -73,13 +80,13 @@ def ingresar():
             )
             respuesta.raise_for_status()
         except requests.exceptions.ConnectionError as error:
-            abort(500, "No se pudo conectar con la API 3de3. " + str(error))
+            abort(500, "No se pudo conectar con la API: " + str(error))
         except requests.exceptions.Timeout as error:
-            abort(500, "Tiempo de espera agotado al conectar con la API 3de3. " + str(error))
+            abort(500, "Tiempo de espera agotado al conectar con la API: " + str(error))
         except requests.exceptions.HTTPError as error:
-            abort(500, "Error HTTP porque la API de 3de3 arrojó un problema: " + str(error))
+            abort(500, "Error HTTP porque la API arrojó un problema: " + str(error))
         except requests.exceptions.RequestException as error:
-            abort(500, "Error desconocido con la API 3de3. " + str(error))
+            abort(500, "Error desconocido con la API: " + str(error))
         datos_ine = respuesta.json()
 
         # Verificar que haya tenido exito
@@ -98,13 +105,13 @@ def ingresar():
             )
             respuesta.raise_for_status()
         except requests.exceptions.ConnectionError as error:
-            abort(500, "No se pudo conectar con la API 3de3. " + str(error))
+            abort(500, "No se pudo conectar con la API: " + str(error))
         except requests.exceptions.Timeout as error:
-            abort(500, "Tiempo de espera agotado al conectar con la API 3de3. " + str(error))
+            abort(500, "Tiempo de espera agotado al conectar con la API: " + str(error))
         except requests.exceptions.HTTPError as error:
-            abort(500, "Error HTTP porque la API de 3de3 arrojó un problema: " + str(error))
+            abort(500, "Error HTTP porque la API arrojó un problema: " + str(error))
         except requests.exceptions.RequestException as error:
-            abort(500, "Error desconocido con la API 3de3. " + str(error))
+            abort(500, "Error desconocido con la API: " + str(error))
         datos_comprobante = respuesta.json()
 
         # Verificar que haya tenido exito
@@ -113,7 +120,7 @@ def ingresar():
         if datos["success"] is False:
             return redirect(url_for("resultados.fallido", message=datos_comprobante["message"]))
 
-        # Enviar a la API el documento de autorizacion
+        # Enviar a la API la autorizacion
         archivo_autorizacion = request.files["autorizacion"]
         try:
             respuesta = requests.post(
@@ -123,13 +130,13 @@ def ingresar():
             )
             respuesta.raise_for_status()
         except requests.exceptions.ConnectionError as error:
-            abort(500, "No se pudo conectar con la API 3de3. " + str(error))
+            abort(500, "No se pudo conectar con la API: " + str(error))
         except requests.exceptions.Timeout as error:
-            abort(500, "Tiempo de espera agotado al conectar con la API 3de3. " + str(error))
+            abort(500, "Tiempo de espera agotado al conectar con la API: " + str(error))
         except requests.exceptions.HTTPError as error:
-            abort(500, "Error HTTP porque la API de 3de3 arrojó un problema: " + str(error))
+            abort(500, "Error HTTP porque la API arrojó un problema: " + str(error))
         except requests.exceptions.RequestException as error:
-            abort(500, "Error desconocido con la API 3de3. " + str(error))
+            abort(500, "Error desconocido con la API: " + str(error))
         datos_autorizacion = respuesta.json()
 
         # Verificar que haya tenido exito

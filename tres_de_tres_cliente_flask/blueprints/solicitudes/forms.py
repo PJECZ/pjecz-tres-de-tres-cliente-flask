@@ -161,10 +161,10 @@ class IngresarForm(FlaskForm):
         validators=[DataRequired()],
         render_kw={"placeholder": "Autorización firmada en archivo PDF", "accept": "application/pdf"},
     )
-    # recaptcha = RecaptchaField()
+    recaptcha = RecaptchaField()
     aceptar = BooleanField(
         "He leído y acepto el <a href='/aviso' class='nav-link link-aviso'>Aviso de Privacidad</a>",
         validators=[DataRequired()],
-        default="checked",
+        default=False,
     )
     registrar = SubmitField("Registrar")

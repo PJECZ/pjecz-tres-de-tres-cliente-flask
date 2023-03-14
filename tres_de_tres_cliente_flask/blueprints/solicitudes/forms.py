@@ -101,7 +101,7 @@ class IngresarForm(FlaskForm):
         validators=[DataRequired(), Length(min=3, max=128)],
     )
     telefono = StringField(
-        "Telefono celular",
+        "Teléfono celular",
         default="",
         validators=[DataRequired(), Length(min=10, max=10)],
         render_kw={"placeholder": "10 dígitos sin espacios ni guiones"},
@@ -117,12 +117,12 @@ class IngresarForm(FlaskForm):
         validators=[DataRequired(), Length(min=10, max=50)],
     )
     numero = StringField(
-        "Numero",
+        "Número",
         default="",
         validators=[DataRequired(), Length(min=2, max=15)],
     )
     cp = StringField(
-        "Codigo Postal",
+        "Código Postal",
         default="",
         validators=[DataRequired(), Length(min=5, max=5)],
     )
@@ -147,7 +147,7 @@ class IngresarForm(FlaskForm):
         default="",
     )
     ine = FileField(
-        "Credencial de elector",
+        "Identificación oficial",
         validators=[DataRequired()],
         render_kw={"placeholder": "Seleccione un archivo PDF con la INE por ambos lados", "accept": "application/pdf"},
     )
